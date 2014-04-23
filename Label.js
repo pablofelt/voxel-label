@@ -19,7 +19,7 @@ function Label(object, playerId, content, duration) {
 
 Label.prototype.buildElement = function() {
   var el = document.createElement('div');
-  el.textContent = this.content;
+  el.innerHTML = this.content;
   el.style.backgroundColor = 'white';
   el.style.position = 'absolute';
   el.style.padding = '1px 4px';
@@ -92,7 +92,7 @@ Label.prototype.render = function(scene, cam) {
 
 Label.prototype.setContent = function(content) {
   this.content = content;
-  this.el.textContent = this.content;
+  this.el.innerHTML = this.content;
 };
 
 Label.prototype.remove = function(delay) {
