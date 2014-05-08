@@ -6,10 +6,10 @@ module.exports = function(game) {
   return LabelPlugin
 }
 
-module.exports.label = function(labelText, avatar, game, playerID) {
+module.exports.label = function(labelContent, vertOffset, avatar, game, playerID) {
   var THREE = game.THREE
   var createLabel = LabelMaker(THREE, LabelPlugin)
-  console.log("Creating label: " + labelText)
-  var playerLabel = new createLabel(avatar, playerID, labelText);
+  console.log("Creating label: " + labelContent)
+  var playerLabel = new createLabel(avatar, playerID, labelContent, vertOffset);
   return playerLabel
 }

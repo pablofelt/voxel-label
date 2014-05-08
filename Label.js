@@ -7,10 +7,11 @@ module.exports = function (three, LabelPlugin) {
 THREE = three // hack until three.js fixes multiple instantiation
 raycaster = new THREE.Raycaster() // test for obstacle occlusion
 
-function Label(object, playerId, content, duration) {
+function Label(object, playerId, content, verticalOffset, duration) {
   this.object = object;
   this.content = content;
   this.playerId = playerId;
+  this.vertOffset = verticalOffset || 0
   if (duration) this.remove(duration);
 
   this.el = this.buildElement();
@@ -32,8 +33,10 @@ Label.prototype.buildElement = function() {
 }
 
 // is a label visible from the camera
-Label.prototype.objectVisibility = function(object,cam,scene){
-  //var log = Math.random()<0.025;
+// returns a number between 0 (invisible) 
+// and 1 (visible). What should be partially 
+// visible depends on personal preference. 
+Label.prototype.objectVisibility = function(object,vertOffset,cam,scene){
   ////////////////////////////////////////
   // Is the point in front of the camera?
   ////////////////////////////////////////
@@ -45,7 +48,8 @@ Label.prototype.objectVisibility = function(object,cam,scene){
   // world coordinate vector in the direction of the camera
   var camdir = cam1.sub(cam0)
   // world coordinate vector from cam to obj
-  var objdir = object.position.clone().sub(cam0)
+  var labelpos = object.position.clone().setY(object.position.y+vertOffset)
+  var objdir = labelpos.sub(cam0)
   // angle between the camera and obj
   var angle = camdir.angleTo(objdir)
   if (angle>Math.PI/2){
@@ -53,7 +57,7 @@ Label.prototype.objectVisibility = function(object,cam,scene){
   }
 
   ////////////////////////////////////////
-  // Is there an obstacle occlusion the label?
+  // Is there an obstacle occluding the label?
   ////////////////////////////////////////
   var collisions,dist
   //raycaster.set(cam0,camdir) // origin,direction
@@ -67,13 +71,15 @@ Label.prototype.objectVisibility = function(object,cam,scene){
     return 0.25;
   }
 
+  // entirely visible
   return 1;
 }
 
 Label.prototype.render = function(scene, cam) {
   var p3d = this.object.position.clone();
   p3d.z = p3d.z + 0 * Math.sin(cam.rotation.x);
-  p3d.y = p3d.y + 0 * Math.cos(cam.rotation.x) * Math.cos(cam.rotation.z);
+  p3d.y = p3d.y + this.vertOffset;//0 * Math.cos(cam.rotation.x) * Math.cos(cam.rotation.z);
+
   p3d.x = p3d.x - 0 * Math.sin(cam.rotation.z) * Math.sin(cam.rotation.y);
 
   // get projection (x and y coordinates according to 2d camera)
@@ -84,10 +90,10 @@ Label.prototype.render = function(scene, cam) {
       w = this.el.offsetWidth,
       h = this.el.offsetHeight;
 
-    this.el.style.top = '' + (height/2 - height/2 * pos.y - h - 10) + 'px';
-    this.el.style.left = '' + (width/2 * pos.x + width/2 - w/2) + 'px';
-  // label is in front of the camera
-  this.el.style.opacity = '' + this.objectVisibility(this.object.avatar,cam,scene);
+  this.el.style.top = '' + (height/2 - height/2 * pos.y - h - 10) + 'px';
+  this.el.style.left = '' + (width/2 * pos.x + width/2 - w/2) + 'px';
+  // label visibility 
+  this.el.style.opacity = '' + this.objectVisibility(this.object.avatar,this.vertOffset,cam,scene);
 };
 
 Label.prototype.setContent = function(content) {
