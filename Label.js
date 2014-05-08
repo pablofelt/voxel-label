@@ -21,13 +21,7 @@ function Label(object, playerId, content, verticalOffset, duration) {
 Label.prototype.buildElement = function() {
   var el = document.createElement('div');
   el.innerHTML = this.content;
-  el.style.backgroundColor = 'white';
   el.style.position = 'absolute';
-  el.style.padding = '1px 4px';
-  el.style.borderRadius = '2px';
-  el.style.maxWidth = (window.innerWidth * 0.25) + 'px';
-  el.style.maxHeight = (window.innerHeight * 0.25) + 'px';
-  el.style.overflowY = 'auto';
   document.body.appendChild(el);
   return el;
 }
