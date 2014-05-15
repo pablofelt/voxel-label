@@ -1,11 +1,12 @@
 // kudos: http://japhr.blogspot.com.es/2013/03/fun-with-threejs-camera-orientation.html
 
-var THREE,raycaster
+var THREE,raycaster,container
 
-module.exports = function (three, LabelPlugin) {
+module.exports = function (three, LabelPlugin, container) {
 
 THREE = three // hack until three.js fixes multiple instantiation
 raycaster = new THREE.Raycaster() // test for obstacle occlusion
+container = container || document.body
 
 function Label(object, playerId, content, verticalOffset, duration) {
   this.object = object;
@@ -14,15 +15,15 @@ function Label(object, playerId, content, verticalOffset, duration) {
   this.vertOffset = verticalOffset || 0
   if (duration) this.remove(duration);
 
-  this.el = this.buildElement();
+  this.el = this.buildElement(container);
   LabelPlugin.add(this);
 }
 
-Label.prototype.buildElement = function() {
+Label.prototype.buildElement = function(container) {
   var el = document.createElement('div');
   el.innerHTML = this.content;
   el.style.position = 'absolute';
-  document.body.appendChild(el);
+  container.appendChild(el);
   return el;
 }
 
@@ -79,8 +80,8 @@ Label.prototype.render = function(scene, cam) {
   // get projection (x and y coordinates according to 2d camera)
   var projector = new THREE.Projector(),
       pos = projector.projectVector(p3d, cam),
-      width = window.innerWidth,
-      height = window.innerHeight,
+      width = container.offsetWidth,
+      height = container.offsetHeight,
       w = this.el.offsetWidth,
       h = this.el.offsetHeight;
 
